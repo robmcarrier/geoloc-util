@@ -3,7 +3,6 @@ package org.github.robmcarrier.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -14,7 +13,6 @@ import org.github.robmcarrier.models.OpenWeatherResponse;
 import org.github.robmcarrier.models.Param;
 import org.github.robmcarrier.models.ZipOpenWeatherResponse;
 import org.github.robmcarrier.services.OpenWeatherMapServiceImpl.REQUEST_TYPE;
-import org.github.robmcarrier.utilities.OpenWeatherException;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -29,9 +27,10 @@ class OpenWeatherMapServiceImplIntegrationTest {
   @MethodSource("getLocData")
   @Tag("integration")
   void getLoc(Param param, OpenWeatherResponse expectedResponse, String message)
-      throws IOException, InterruptedException, OpenWeatherException, URISyntaxException {
+      throws IOException, InterruptedException {
     log.info(message);
-    ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfiguration.class);
+    ApplicationContext context = new AnnotationConfigApplicationContext(
+        ApplicationConfiguration.class);
     OpenWeatherMapService openWeatherMapService = context.getBean(OpenWeatherMapService.class);
     OpenWeatherResponse actualResponse = openWeatherMapService.getLoc(param);
 
