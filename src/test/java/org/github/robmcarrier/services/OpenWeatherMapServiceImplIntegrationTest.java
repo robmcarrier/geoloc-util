@@ -3,19 +3,24 @@ package org.github.robmcarrier.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 import lombok.extern.java.Log;
+import org.github.robmcarrier.configuration.ApplicationConfiguration;
 import org.github.robmcarrier.models.LocationNameOpenWeatherResponse;
 import org.github.robmcarrier.models.OpenWeatherResponse;
 import org.github.robmcarrier.models.Param;
 import org.github.robmcarrier.models.ZipOpenWeatherResponse;
 import org.github.robmcarrier.services.OpenWeatherMapServiceImpl.REQUEST_TYPE;
+import org.github.robmcarrier.utilities.OpenWeatherException;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 @Log
 class OpenWeatherMapServiceImplIntegrationTest {
@@ -24,17 +29,19 @@ class OpenWeatherMapServiceImplIntegrationTest {
   @MethodSource("getLocData")
   @Tag("integration")
   void getLoc(Param param, OpenWeatherResponse expectedResponse, String message)
-      throws IOException, InterruptedException {
+      throws IOException, InterruptedException, OpenWeatherException, URISyntaxException {
     log.info(message);
-    OpenWeatherMapServiceImpl openWeatherMapService = new OpenWeatherMapServiceImpl();
+    ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfiguration.class);
+    OpenWeatherMapService openWeatherMapService = context.getBean(OpenWeatherMapService.class);
     OpenWeatherResponse actualResponse = openWeatherMapService.getLoc(param);
 
     assertEquals(expectedResponse, actualResponse,
         "Response from OpenWeatherMap doesn't match expected.");
   }
 
-  public static Stream<Arguments> getLocData() {
-    return Stream.of(Arguments.of(new Param(REQUEST_TYPE.LOCATION_NAME, "Madison, WI"),
+  private static Stream<Arguments> getLocData() {
+    return Stream.of(
+        Arguments.of(new Param(REQUEST_TYPE.LOCATION_NAME, "Madison, WI"),
             getMadisonResponse(), "Location Name for Madison, WI"),
         Arguments.of(new Param(REQUEST_TYPE.ZIP, "91910"), get91910Response(),
             "Zip code for 91910"),
@@ -60,8 +67,5 @@ class OpenWeatherMapServiceImplIntegrationTest {
     localNames.put("ta", "மேடிசன்");
     return new LocationNameOpenWeatherResponse("Madison",
         localNames, "43.074761", "-89.3837613", "US", "Wisconsin");
-
   }
-
-
 }

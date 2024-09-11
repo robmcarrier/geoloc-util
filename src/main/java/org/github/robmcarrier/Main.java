@@ -4,19 +4,22 @@ import com.google.gson.Gson;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.java.Log;
+import org.github.robmcarrier.configuration.ApplicationConfiguration;
 import org.github.robmcarrier.models.OpenWeatherResponse;
 import org.github.robmcarrier.models.Param;
-import org.github.robmcarrier.services.OpenWeatherMapServiceImpl;
+import org.github.robmcarrier.services.OpenWeatherMapService;
 import org.github.robmcarrier.services.OpenWeatherMapServiceImpl.REQUEST_TYPE;
 import org.github.robmcarrier.utilities.ArgumentValidator;
-import org.github.robmcarrier.utilities.GsonManager;
 import org.github.robmcarrier.utilities.PatternUtil;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 @Log
 public class Main {
-
   public static void main(String[] args) {
-    OpenWeatherMapServiceImpl openWeatherMapService = new OpenWeatherMapServiceImpl();
+    ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfiguration.class);
+    OpenWeatherMapService openWeatherMapService = context.getBean(OpenWeatherMapService.class);
+    Gson gson = context.getBean(Gson.class);
 
     List<OpenWeatherResponse> responses = Arrays.stream(args).map(arg -> {
       if (!ArgumentValidator.isValid(arg)) {
@@ -35,11 +38,10 @@ public class Main {
       }
     }).toList();
 
-    log.info(toString(responses));
+    log.info(toString(gson, responses));
   }
 
-  public static String toString(List<OpenWeatherResponse> responses) {
-    Gson gson = GsonManager.getInstance();
+  public static String toString(Gson gson, List<OpenWeatherResponse> responses) {
     return gson.toJson(responses);
   }
 }
