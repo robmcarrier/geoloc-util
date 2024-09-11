@@ -8,6 +8,7 @@ import org.github.robmcarrier.models.OpenWeatherResponse;
 import org.github.robmcarrier.models.Param;
 import org.github.robmcarrier.services.OpenWeatherMapServiceImpl;
 import org.github.robmcarrier.services.OpenWeatherMapServiceImpl.REQUEST_TYPE;
+import org.github.robmcarrier.utilities.ArgumentValidator;
 import org.github.robmcarrier.utilities.GsonManager;
 import org.github.robmcarrier.utilities.PatternUtil;
 
@@ -18,6 +19,10 @@ public class Main {
     OpenWeatherMapServiceImpl openWeatherMapService = new OpenWeatherMapServiceImpl();
 
     List<OpenWeatherResponse> responses = Arrays.stream(args).map(arg -> {
+      if (!ArgumentValidator.isValid(arg)) {
+        log.info("Following arg is in invalid format: " + arg);
+        return null;
+      }
       Param param = new Param();
       param.setRequestType(PatternUtil.isZip(arg) ? REQUEST_TYPE.ZIP : REQUEST_TYPE.LOCATION_NAME);
       param.setValue(arg);

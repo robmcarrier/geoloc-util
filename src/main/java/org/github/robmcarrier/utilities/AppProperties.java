@@ -18,8 +18,9 @@ public class AppProperties {
     appProps = new Properties();
     try (InputStream appConfigFileStream = AppProperties.class.getResourceAsStream( "/application.properties")) {
       appProps.load(appConfigFileStream);
-    } catch (IOException ioException) {
+    } catch (Exception e) {
       log.severe("Unable to load properties from application.properties");
+      log.severe(e.getMessage());
       throw new PropFileNotFoundException();
     }
   }

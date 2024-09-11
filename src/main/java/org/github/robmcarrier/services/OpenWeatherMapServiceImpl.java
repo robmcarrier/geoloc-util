@@ -42,7 +42,7 @@ public class OpenWeatherMapServiceImpl implements OpenWeatherMapService {
     } else {
       builder
           .path("direct")
-          .queryParam("q", value)
+          .queryParam("q", value + ",US")
           .queryParam("limit", "1");
     }
     return builder.queryParam("appid", getApiKey()).build(false).toUri();
@@ -60,7 +60,8 @@ public class OpenWeatherMapServiceImpl implements OpenWeatherMapService {
 
     Gson gson = GsonManager.getInstance();
     if (REQUEST_TYPE.LOCATION_NAME.equals(requestType)) {
-      return gson.fromJson(response.body(), LocationNameOpenWeatherResponse[].class)[0];
+      LocationNameOpenWeatherResponse[] responses = gson.fromJson(response.body(), LocationNameOpenWeatherResponse[].class);
+      return responses.length == 0 ? new LocationNameOpenWeatherResponse() : responses[0];
     }
     return gson.fromJson(response.body(), ZipOpenWeatherResponse.class);
 
